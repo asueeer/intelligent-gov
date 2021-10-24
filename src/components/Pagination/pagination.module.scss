@@ -1,0 +1,22 @@
+.pagination {
+  padding: 24px 0;
+  margin: 0 auto;
+  width: 500px;
+  display: flex;
+  justify-content: space-around;
+}
+.page {
+  font-size: 20px;
+  line-height: 28px;
+  margin: 0 6px;
+  min-width: 28px;
+  flex-shrink: 0;
+  text-align: center;
+  border: 1px solid #0168b7;
+  cursor: pointer;
+  border-radius: 6px;
+  &.curr {
+    background: #0168b7;
+    color: #FFF;
+  }
+}

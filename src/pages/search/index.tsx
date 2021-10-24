@@ -1,13 +1,200 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Loading, Pagination } from '../../components';
+import Selectors from './Selectors';
 import classnames from 'classnames/bind';
+import dayjs from 'dayjs';
+
+import {
+  getQuerySuggestion,
+  getSearchResult,
+} from "../../services/api";
 import style from './search.module.scss';
 
 const cx = classnames.bind(style);
 
-const Search = () => {
-    return (
-        <div className={cx('page')}>search</div>
-    )
+const Search: React.FC = () => {
+  const [list, setList] = useState<Array<string>>([]);
+  const [result, setResult] = useState<Array<any>>([]);
+  const [query, setQuery] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [inputFocus, setInputFocus] = useState<boolean>(false);
+  const [params, setParams] = useState<Record<string, string|number>>({});
+  const [category, setCategory] = useState<string>('ALL'); // TODO: select cate
+  const [type, setType] = useState<string>('ALL');
+  const [page, setPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const timer = useRef<NodeJS.Timeout>();
+
+  const checkSuggestion = () => {
+    if (query) {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      timer.current = setTimeout(() => {
+        getQuerySuggestion(query).then(({ results }) => setList(results));
+      }, 500);
+    } else {
+      setList([]);
+    }
+  }
+
+  const onInputFocus = () => {
+    setInputFocus(true);
+    checkSuggestion();
+  }
+
+  const onInputBlur = () => {
+    setInputFocus(false);
+  }
+
+  const search = (input: string, select?: boolean) => {
+    if (query) {
+      setLoading(true);
+      setList([]);
+      setTotalPage(0);
+      getSearchResult({
+        query: input, // FIXME:
+        input,
+        select: select ? input : '',
+        webID: String(localStorage.getItem('visitorId')),
+        page_number: page,
+        type,
+        category,
+        ...params,
+      }).then((res) => {
+        const { list, total } = res?.data;
+        if (list?.length) {
+          setResult(list as Array<any>);
+          setTotalPage(Math.ceil(total / 10));
+          setLoading(false);
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    checkSuggestion();
+  }, [query]);
+
+  useEffect(() => {
+    search(query);
+  }, [page]);
+
+  useEffect(() => {
+    if (page !== 1) {
+      setPage(1);
+    } else {
+      search(query);
+    }
+  }, [params, type]);
+
+  const pickParam = (name: string, value: string | number) => {
+    setParams((p) => ({ ...p, [name]: value }));
+  };
+
+  const service = (link: string, e: any) => {
+    e.stopPropagation();
+    window.open(link);
+  }
+
+  return (
+    <div className={cx('page')}>
+      <div className={cx('flex__wrapper', { focus: inputFocus || query })}>
+        <div className={cx('padding')}></div>
+        <div className={cx('content')}>
+          <div className={cx('header')}>
+            <img
+              className={cx('header__img')}
+              src="http://up.deskcity.org/pic_source/47/13/c7/4713c7b9f10db60652874a6bc1d79b73.jpg"
+              alt=""
+            />
+          </div>
+          <div className={cx('search__wrapper')}>
+            <div className={cx('search', 'search-common')}>
+              <div className={cx('input')}>
+                <input
+                  className={cx('input_el', 'query')}
+                  onChange={({ target }) => setQuery(target?.value)}
+                  onFocus={onInputFocus}
+                  onBlur={onInputBlur}
+                  value={query}
+                ></input>
+              </div>
+              <div className={cx('button')} onClick={() => search(query)}>
+                搜索
+              </div>
+            </div>
+            <div
+              className={cx('recommends', 'search-common', {
+                show: Boolean(list.length > 0 && inputFocus),
+              })}
+            >
+              {list?.map((l) => (
+                <div className={cx('query')} onClick={() => search(l, true)}>
+                  {l}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <Selectors
+        params={params}
+        updateParams={pickParam}
+        updateCate={(value) => setType(value)}
+      />
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className={cx('body')}>
+          <div className={cx('result__wrapper')}>
+            {result?.map((res) => (
+              <a
+                className={cx('result')}
+                href={res?.contextLink}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <div className={cx('title')}>
+                  {res?.category && (<div className={cx('category')}>{res?.category}</div>)}
+                  <span
+                    className={cx('link')}
+                    dangerouslySetInnerHTML={{ __html: res?.title }}
+                  ></span>
+                </div>
+                <div className={cx('detail')}>
+                  <span
+                    className={cx('link')}
+                    dangerouslySetInnerHTML={{ __html: res?.abs }}
+                  ></span>
+                </div>
+                {res?.department && (
+                  <div className={cx('department')}>
+                    办理机构：{res.department}
+                  </div>
+                )}
+                {res?.serviceLink && (
+                  <div
+                    className={cx('service')}
+                    onClick={(e) => service(res.serviceLink, e)}
+                  >
+                    立即办理
+                  </div>
+                )}
+                {res?.time && (<div className={cx('time')}>
+                  时间：{dayjs(res?.time).format('YYYY-MM-DD')}
+                </div>)}
+              </a>
+            ))}
+          </div>
+          <div className={cx('right')}></div>
+        </div>
+      )}
+      {totalPage > 1 && (
+        <Pagination current={page} total={totalPage} jump={(p) => setPage(p)} />
+      )}
+    </div>
+  );
 }
 
 export default Search;

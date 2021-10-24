@@ -1,20 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter, Route, Redirect } from 'react-router-dom';
+import reportWebVitals from './reportWebVitals';
+import { HashRouter, Route } from 'react-router-dom';
+import { setVisitorId } from './utils/fingerprint';
 import './index.css';
 import Search from './pages/search';
-import reportWebVitals from './reportWebVitals';
+import Im from './pages/im';
+import ImService  from './pages/im-service';
+
+setVisitorId();
 
 ReactDOM.render(
   <React.StrictMode>
     <HashRouter>
-      <Route path='/'>
-        <Redirect from='/' to='/search' />
-      </Route>
-      <Route path='/search' component={Search} />
+      <Route path="/search" component={Search} />
+      <Route path="/im/" component={Im} />
+      <Route path="/im-service/" component={ImService} />
     </HashRouter>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

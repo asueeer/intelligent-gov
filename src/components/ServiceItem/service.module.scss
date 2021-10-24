@@ -1,0 +1,49 @@
+@import '../../scss/mixin.scss';
+@import '../../scss/variable.scss';
+
+.wrapper {
+  padding: 12px;
+  background-color: $bgColor;
+  position: relative;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 0 5px;
+  &.active {
+    background-color: darken($bgColor, 5%);
+  }
+  &:hover {
+    background-color: darken($bgColor, 5%);
+  }
+}
+.alert {
+  color: #FFF;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $red;
+  border-radius: 50%;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.title {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  @include clamp;
+}
+.abstract {
+  font-size: 14px;
+  line-height: 20px;
+  margin-top: 6px;
+  @include clamp;
+}
+.time {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-size: 12px;
+  color: $gray;
+}
