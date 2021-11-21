@@ -8,6 +8,7 @@ import {
   sendMessage,
   loadMessage,
 } from '../../services/api';
+import WS from '../../utils/websocket';
 
 const cx = classnames.bind(style)
 
@@ -15,22 +16,10 @@ const Im: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [convId, setConvId] = useState<string>('');
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const pullRef = useRef<NodeJS.Timeout|null>(null);
-
-  const loadConversation = async (id: string) => {
-    const res = await loadMessage(id, 0);
-    if (Array.isArray(res?.data?.messages)) {
-      setMessages(res?.data?.messages);
-    }
-  }
-
-  // const setFetcher = (id: string) => {
-  //   pullRef.current = setInterval(async () => {
-  //     // TODO: 拉取最新
-  //   }, 5000);
-  // };
+  const wsRef = useRef<WS>();
 
   const callService = async () => {
+    if (convId) return;
     await getImToken();
     const res = await createConversation();
     if (res?.data?.conv_id) {
@@ -44,6 +33,15 @@ const Im: React.FC = () => {
         type: 'text'
       });
       setConvId(res?.data?.conv_id);
+    } else {
+      messages.push({
+        role: 'sys_helper',
+        content: {
+          text: '暂无客服，请稍后重试',
+        },
+        timestamp: Date.now(),
+        type: 'text',
+      });
     }
   }
 
@@ -56,25 +54,40 @@ const Im: React.FC = () => {
         },
         conv_id: convId,
       });
-      setTimeout(async () => {
-        await loadConversation(convId);
-      }, 1000);
     } else {
       switch (message) {
         case '人工':
           callService();
       }
-      messages.push({
-        role: 'visitor',
-        content: {
-          text: message,
-        },
-        timestamp: Date.now(),
-        type: 'text',
-      });
     }
+    messages.push({
+      role: 'visitor',
+      content: {
+        text: message,
+      },
+      timestamp: Date.now(),
+      type: 'text',
+    });
     setMessage('');
   }
+
+  useEffect(() => {
+    if (localStorage.getItem('conv_id')) {
+      setConvId(String(localStorage.getItem('conv_id')));
+    }
+    return () => {
+      console.warn('leave');
+      wsRef.current?.close();
+    }
+  }, []);
+  useEffect(() => {
+    if (convId) {
+      loadMessage(convId, 0).then(res => {
+        console.warn('load', res);
+      });
+      wsRef.current = new WS(String(sessionStorage.getItem('auth_token')));
+    }
+  }, [convId]);
   useEffect(() => {
     const win = document.querySelector('#window');
     if (win) {
@@ -86,33 +99,7 @@ const Im: React.FC = () => {
       }
     }
   }, [messages]);
-  useEffect(() => {
-    let t: null | NodeJS.Timer = null;
-    if (localStorage.getItem('conv_id')) {
-      loadConversation(String(localStorage.getItem('conv_id')));
-      t = setInterval(() => {
-        loadConversation(String(localStorage.getItem('conv_id')));
-      }, 10000);
-      setConvId(String(localStorage.getItem('conv_id')));
-    } else {
-      setMessages((m) =>
-        m.concat([
-          {
-            role: 'sys_helper',
-            content: {
-              text: '我是智能客服，请问您有什么需要帮助？\n发送“人工”可以请求人工客服'
-            },
-            timestamp: Date.now(),
-            type: 'text'
-          },
-        ])
-      );
-    }
-    return () => {
-      if (pullRef.current) clearInterval(pullRef.current);
-      if (t) clearInterval(t);
-    }
-  }, [])
+  
   return (
     <div className={cx('im')}>
       <div className={cx('header')}>智能客服</div>

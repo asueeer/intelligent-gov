@@ -8,9 +8,11 @@ import {
   getQuerySuggestion,
   getSearchResult,
 } from "../../services/api";
+import Log from '../../utils/report';
 import style from './search.module.scss';
 
 const cx = classnames.bind(style);
+const log = new Log();
 
 const Search: React.FC = () => {
   const [list, setList] = useState<Array<string>>([]);
@@ -31,7 +33,10 @@ const Search: React.FC = () => {
         clearTimeout(timer.current);
       }
       timer.current = setTimeout(() => {
-        getQuerySuggestion(query).then(({ results }) => setList(results));
+        getQuerySuggestion(query).then((res) => {
+          console.warn(res);
+          setList(res?.results)
+        });
       }, 500);
     } else {
       setList([]);
@@ -52,6 +57,16 @@ const Search: React.FC = () => {
       setLoading(true);
       setList([]);
       setTotalPage(0);
+      if (select) {
+        log.send('pick_suggestion', {
+          query,
+          suggestion: input,
+        });
+      } else {
+        log.send('search_query', {
+          query,
+        });
+      }
       getSearchResult({
         query: input, // FIXME:
         input,
@@ -71,6 +86,12 @@ const Search: React.FC = () => {
       });
     }
   };
+
+  const clickResult = (detail: any) => {
+    log.send('click_result', {
+      
+    })
+  }
 
   useEffect(() => {
     checkSuggestion();
@@ -126,7 +147,7 @@ const Search: React.FC = () => {
             </div>
             <div
               className={cx('recommends', 'search-common', {
-                show: Boolean(list.length > 0 && inputFocus),
+                show: Boolean(list?.length > 0 && inputFocus),
               })}
             >
               {list?.map((l) => (
@@ -152,6 +173,7 @@ const Search: React.FC = () => {
               <a
                 className={cx('result')}
                 href={res?.contextLink}
+                onClick={() => clickResult(res)}
                 rel="noreferrer"
                 target="_blank"
               >

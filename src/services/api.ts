@@ -19,6 +19,15 @@ interface searchParams {
   range?: string;
   time?: string; // FIXME: use em=num
 }
+interface reportEvent {
+  eventName: string;
+  header: {
+    did: string;
+    userAgent: string;
+    url?: string;
+  };
+  params: Record<string, any>;
+}
 const sendRequest = (url: string, data: Record<string, any>, options?: requestConfig) => {
   // Default options are marked with *
   let _url = url.startsWith('http') ? url : `${origin}${url}`;
@@ -41,7 +50,7 @@ const sendRequest = (url: string, data: Record<string, any>, options?: requestCo
   return fetch(_url, fetchConfig)
   .then(response => response.json()) // parses response to JSON
   .then(data => {
-    return data;
+    return data || {};
   }).catch((e) => {
     console.warn('fetch error', e);
   });
@@ -109,7 +118,7 @@ export const sendMessage = async (params: { type: messageType; conv_id: string; 
 export const loadMessage = (conv_id: string, cursor: number) => sendRequest(`https://asueeer.com/api/im/load_conversation_detail?auth_token=${sessionStorage.getItem('auth_token')}`, {
   conv_id,
   cursor: `${cursor}`,
-  limit: 10
+  limit: 20
 }, {
   method: 'POST',
 })
@@ -141,3 +150,9 @@ export const sendServiceMessage = async (params: { type: messageType; conv_id: s
 export const loadMessageList = () => sendRequest('https://asueeer.com/api/im/load_conversations?mock_login=123', {}, {
   method: 'POST',
 })
+
+export const report = (eventPramse: reportEvent) => sendRequest('/api/eventTracking', {
+  event: eventPramse.eventName,
+  header: encodeURIComponent(JSON.stringify(eventPramse.header)),
+  params: encodeURIComponent(JSON.stringify(eventPramse.params)),
+});
