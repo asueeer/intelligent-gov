@@ -23,7 +23,8 @@ const ServiceItem: React.FC<IServiceItem> = (prop) => {
     <div className={cx('wrapper', { active })} onClick={() => onSelect()}>
       <div className={cx('title')}>{conv_id}</div>
       <div className={cx('abstract')}>{last_msg?.content?.[last_msg?.type||'text']||'暂无消息'}</div>
-      <div className={cx('time')}>{dayjs(timestamp).format('MM-DD HH:mm')}</div>
+      {/* FIXME: set time zone */}
+      <div className={cx('time')}>{dayjs(timestamp - 8 * 60 * 60 * 1000).format('MM-DD HH:mm')}</div>
       {unread && <div className={cx('alert')}>{unread}</div>}
     </div>
   );

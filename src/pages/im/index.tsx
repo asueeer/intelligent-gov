@@ -24,24 +24,30 @@ const Im: React.FC = () => {
     const res = await createConversation();
     if (res?.data?.conv_id) {
       localStorage.setItem('conv_id', res?.data?.conv_id);
-      messages.push({
-        role: 'sys_helper',
-        content: {
-          text: '已为您转接人工客服'
+      setMessages((ms) => [
+        ...ms,
+        {
+          role: 'sys_helper',
+          content: {
+            text: '已为您转接人工客服',
+          },
+          timestamp: Date.now(),
+          type: 'text',
         },
-        timestamp: Date.now(),
-        type: 'text'
-      });
+      ]);
       setConvId(res?.data?.conv_id);
     } else {
-      messages.push({
-        role: 'sys_helper',
-        content: {
-          text: '暂无客服，请稍后重试',
+      setMessages((ms) => [
+        ...ms,
+        {
+          role: 'sys_helper',
+          content: {
+            text: '暂无客服，请稍后重试',
+          },
+          timestamp: Date.now(),
+          type: 'text',
         },
-        timestamp: Date.now(),
-        type: 'text',
-      });
+      ]);
     }
   }
 
@@ -54,6 +60,17 @@ const Im: React.FC = () => {
         },
         conv_id: convId,
       });
+      setMessages((ms) => [
+        ...ms,
+        {
+          role: 'visitor',
+          type: 'text',
+          content: {
+            text: message,
+          },
+          timestamp: Date.now(),
+        },
+      ]);
     } else {
       switch (message) {
         case '人工':
@@ -83,9 +100,14 @@ const Im: React.FC = () => {
   useEffect(() => {
     if (convId) {
       loadMessage(convId, 0).then(res => {
-        console.warn('load', res);
+        if (res?.data?.messages) {
+          setMessages(res?.data?.messages);
+        }
       });
       wsRef.current = new WS(String(sessionStorage.getItem('auth_token')));
+      wsRef.current.on('101', (res) => {
+        setMessages(ms => [...ms, res]);
+      })
     }
   }, [convId]);
   useEffect(() => {

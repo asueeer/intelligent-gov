@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import classnames from 'classnames/bind'
 import style from './im.module.scss'
 import Message, {IMessage} from '../../components/Message'
@@ -8,6 +8,7 @@ import {
   sendServiceMessage,
 } from '../../services/api';
 import ServiceItem from '../../components/ServiceItem';
+import WS from '../../utils/websocket';
 
 interface convItem {
   conv_id: string;
@@ -22,6 +23,7 @@ const ImService: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [msgIndex, setIndex] = useState<number>(-1);
+  const wsRef = useRef<WS>();
   const convId = useMemo(() => {
     return convList?.[msgIndex]?.conv_id;
   }, [convList, msgIndex])
@@ -34,6 +36,18 @@ const ImService: React.FC = () => {
   };
 
   const send = async () => {
+    setMessages((ms) => [
+      ...ms,
+      {
+        role: 'be_helper',
+        type: 'text',
+        content: {
+          text: message,
+        },
+        conv_id: convId,
+        timestamp: Date.now(),
+      },
+    ]);
     await sendServiceMessage({
       type: 'text',
       content: {
@@ -42,12 +56,6 @@ const ImService: React.FC = () => {
       conv_id: convId,
     });
     setMessage('');
-    setTimeout(async () => {
-      const res = await loadServiceMessage(convId, 0);
-      if (Array.isArray(res?.data?.messages)) {
-        setMessages(res?.data?.messages);
-      }
-    }, 1000);
   }
   const selectItem = (i: number) => {
     setIndex(i);
@@ -61,7 +69,7 @@ const ImService: React.FC = () => {
         }
       });
     }
-  }, [convId]);
+  }, [convId, convList]);
 
   useEffect(() => {
     const win = document.querySelector('#window');
@@ -77,11 +85,23 @@ const ImService: React.FC = () => {
 
   useEffect(() => {
     fetctConvList();
-    const t = setInterval(() => {
-      fetctConvList();
-    }, 5000);
+    wsRef.current = new WS();
+    wsRef.current.on('101', (res) => {
+      const { content, conv_id } = res;
+      setList((l) => l.map((c) => c.conv_id === conv_id ? {
+        ...c,
+        last_msg: {
+          ...c.last_msg,
+          content
+        }
+      } : c));
+      
+    });
+    wsRef.current.on('102', (res) => {
+      setList(l => [...l, res]);
+    });
     return () => {
-      clearInterval(t);
+      wsRef.current?.close();
     }
   }, []);
   return (

@@ -1,8 +1,8 @@
 class WS {
   ws: WebSocket;
-  cbs: Record<string, any[]>;
+  cbs: Record<string, ((msg: any) => void)[]>;
   interval: NodeJS.Timer | null;
-  constructor(auth_token: string) {
+  constructor(auth_token?: string) {
     if (auth_token) {
       this.ws = new WebSocket(`ws://47.104.186.111:1988/api/im/ws?auth_token=${auth_token}`)
     } else {
@@ -20,7 +20,7 @@ class WS {
           type: 0,
           message: 'heartbeats'
         }))
-      }, 10000);
+      }, 30000);
     }
     this.ws.onmessage = (evt) => {
       if (evt.data) {
@@ -38,10 +38,18 @@ class WS {
       }
     }
   }
-  receiveMessage(message:string) {
-    console.warn('receive', message);
+  receiveMessage(messageData:string) {
+    try {
+      const { type, msg } = JSON.parse(messageData);
+      if (Array.isArray(this.cbs[type])) {
+        for (const cb of this.cbs[type]) {
+          cb?.(msg)
+        }
+      }
+    } catch {
+    }
   }
-  on(type: string, cb: any) {
+  on(type: string, cb: (msg: any) => void) {
     if (Array.isArray(this.cbs[type])) {
       this.cbs[type].push(cb);
     } else {

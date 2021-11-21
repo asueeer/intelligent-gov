@@ -88,9 +88,13 @@ const Search: React.FC = () => {
   };
 
   const clickResult = (detail: any) => {
+    const { title, category, department, serviceLink } = detail;
     log.send('click_result', {
-      
-    })
+      title,
+      category,
+      department,
+      serviceLink,
+    });
   }
 
   useEffect(() => {
