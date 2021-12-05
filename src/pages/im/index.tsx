@@ -10,11 +10,19 @@ import {
 } from '../../services/api';
 import WS from '../../utils/websocket';
 
+declare global {
+  interface Window {
+    startRecording: any;
+    stopRecording: any;
+  }
+}
+
 const cx = classnames.bind(style)
 
 const Im: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [convId, setConvId] = useState<string>('');
+  const [voiceStatus, setVoice] = useState<number>(0);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const wsRef = useRef<WS>();
 
@@ -88,6 +96,18 @@ const Im: React.FC = () => {
     setMessage('');
   }
 
+  const inputVoice = () => {
+    window.startRecording();
+    setVoice(1);
+  }
+
+  const stopVoice = async () => {
+    setVoice(2);
+    const res = await window.stopRecording();
+    console.warn('done', res);
+    setVoice(0);
+  }
+
   useEffect(() => {
     if (localStorage.getItem('conv_id')) {
       setConvId(String(localStorage.getItem('conv_id')));
@@ -121,7 +141,7 @@ const Im: React.FC = () => {
       }
     }
   }, [messages]);
-  
+
   return (
     <div className={cx('im')}>
       <div className={cx('header')}>智能客服</div>
@@ -131,6 +151,7 @@ const Im: React.FC = () => {
         ))}
       </div>
       <div className={cx('input__wrapper')}>
+        <div className={cx('input-audio')} onMouseDown={inputVoice} onMouseUp={stopVoice}>{voiceStatus === 0 ? '按住输入语音' : voiceStatus === 2 ? '解析中' : '输入中'}</div>
         <input
           className={cx('input-box')}
           value={message}
