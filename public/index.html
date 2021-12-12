@@ -73,16 +73,19 @@
 
       function stopRecording() {
         return new Promise(resolve => {
+          if (!recorder) {
+            resolve();
+            return;
+          }
           recorder.stop();
           recorder.exportWAV(function(s) {
             // audio.src = window.URL.createObjectURL(s);
             const form = new FormData();
             form.append('blob', s, 'record.wav');
-            fetch('http://localhost:3000/upload', {
+            fetch('http://10.13.56.38:8000/recognize/audio', {
               method: 'POST',
               body: form
-            });
-            resolve(fetch);
+            }).then(resp => resp.json()).then(res => resolve(res)).catch(e => resolve(e));
           });
         })
       }

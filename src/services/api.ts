@@ -55,6 +55,12 @@ const sendRequest = (url: string, data: Record<string, any>, options?: requestCo
     console.warn('fetch error', e);
   });
 }
+export const loginService = async (username: string, password: string) => sendRequest(`https://asueeer.com/api/login`, {
+  username,
+  password
+}, {
+  method: 'POST'
+})
 export const getQuerySuggestion = async (query: string) => sendRequest('/api/suggest/result', {
   query,
   page_size: 5
@@ -125,10 +131,9 @@ export const loadMessage = (conv_id: string, cursor: number) => sendRequest(`htt
 
 /**
  * 客服相关接口，目前通过 mock_login 参数鉴权
- * // TODO: 客服登录
  */
 
-export const loadServiceMessage = (conv_id: string, cursor: number) => sendRequest('https://asueeer.com/api/im/load_conversation_detail?mock_login=123', {
+export const loadServiceMessage = (conv_id: string, cursor: number, service_token: string) => sendRequest(`https://asueeer.com/api/im/load_conversation_detail?auth_token=${service_token}`, {
   conv_id,
   cursor: `${cursor}`,
   limit: 10
@@ -136,9 +141,9 @@ export const loadServiceMessage = (conv_id: string, cursor: number) => sendReque
   method: 'POST',
 })
 
-export const sendServiceMessage = async (params: { type: messageType; conv_id: string; content: any }) => {
+export const sendServiceMessage = async (params: { type: messageType; conv_id: string; content: any }, service_token: string) => {
   const { type, content, conv_id } = params;
-  sendRequest('https://asueeer.com/api/im/send_message?mock_login=123', {
+  sendRequest(`https://asueeer.com/api/im/send_message?auth_token=${service_token}`, {
     type, content, conv_id,
     role: 'be_helper',
     timestamp: Date.now()
@@ -147,8 +152,16 @@ export const sendServiceMessage = async (params: { type: messageType; conv_id: s
   })
 }
 
-export const loadMessageList = () => sendRequest('https://asueeer.com/api/im/load_conversations?mock_login=123', {}, {
+export const loadMessageList = (token: string) => sendRequest(`https://asueeer.com/api/im/load_conversations?auth_token=${token}`, {
+  status: ['chatting', 'waiting']
+}, {
   method: 'POST',
+})
+
+export const acceptConversation = (covId: string, token: string) => sendRequest(`https://asueeer.com/api/im/accept_conversation?auth_token=${token}`, {
+  conv_id: covId,
+}, {
+  method: 'POST'
 })
 
 export const report = (eventPramse: reportEvent) => sendRequest('/api/eventTracking', {

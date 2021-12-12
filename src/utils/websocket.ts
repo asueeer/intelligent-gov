@@ -1,22 +1,24 @@
 class WS {
-  ws: WebSocket;
+  ws?: WebSocket;
   cbs: Record<string, ((msg: any) => void)[]>;
   interval: NodeJS.Timer | null;
   constructor(auth_token?: string) {
+    const service_token = sessionStorage.getItem('service_token');
     if (auth_token) {
       this.ws = new WebSocket(`ws://47.104.186.111:1988/api/im/ws?auth_token=${auth_token}`)
-    } else {
-      this.ws = new WebSocket('ws://47.104.186.111:1988/api/im/ws?mock_login=123');
+    } else if (service_token) {
+      this.ws = new WebSocket(`ws://47.104.186.111:1988/api/im/ws?auth_token=${service_token}`);
     }
     this.init();
     this.interval = null;
     this.cbs = {};
   }
   init() {
+    if (!this.ws) return;
     this.ws.onopen = () => {
       console.log( "ws connected");
       this.interval = setInterval(() => {
-        this.ws.send(JSON.stringify({
+        this.ws?.send(JSON.stringify({
           type: 0,
           message: 'heartbeats'
         }))

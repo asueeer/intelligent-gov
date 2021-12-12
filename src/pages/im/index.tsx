@@ -60,31 +60,32 @@ const Im: React.FC = () => {
   }
 
   const send = async () => {
-    if (convId) {
-      await sendMessage({
-        type: 'text',
-        content: {
-          text: message
-        },
-        conv_id: convId,
-      });
-      setMessages((ms) => [
-        ...ms,
-        {
-          role: 'visitor',
+    if (message) {
+      if (convId) {
+        await sendMessage({
           type: 'text',
           content: {
             text: message,
           },
-          timestamp: Date.now(),
-        },
-      ]);
-    } else {
-      switch (message) {
-        case '人工':
-          callService();
+          conv_id: convId,
+        });
+        setMessages((ms) => [
+          ...ms,
+          {
+            role: 'visitor',
+            type: 'text',
+            content: {
+              text: message,
+            },
+            timestamp: Date.now(),
+          },
+        ]);
+      } else {
+        switch (message) {
+          case '人工':
+            callService();
+        }
       }
-    }
     messages.push({
       role: 'visitor',
       content: {
@@ -94,6 +95,7 @@ const Im: React.FC = () => {
       type: 'text',
     });
     setMessage('');
+    }
   }
 
   const inputVoice = () => {
@@ -112,8 +114,12 @@ const Im: React.FC = () => {
     if (localStorage.getItem('conv_id')) {
       setConvId(String(localStorage.getItem('conv_id')));
     }
+    document.addEventListener('keydown', function(e){
+      if (e?.key === 'Enter') {
+        send();
+      }
+    }, false);
     return () => {
-      console.warn('leave');
       wsRef.current?.close();
     }
   }, []);
