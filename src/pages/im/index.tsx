@@ -106,7 +106,9 @@ const Im: React.FC = () => {
   const stopVoice = async () => {
     setVoice(2);
     const res = await window.stopRecording();
-    console.warn('done', res);
+    if (res?.code === 0) {
+      setMessage(res?.data);
+    }
     setVoice(0);
   }
 
