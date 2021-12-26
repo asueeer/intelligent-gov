@@ -28,16 +28,9 @@ const ImService: React.FC = () => {
   const [convList, setList] = useState<convItem[]>([]);
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const [msgIndex, setIndex] = useState<number>(-1);
+  const [convId, setConvid] = useState<string>('');
   const [waitStatus, setWaiting] = useState(false); 
   const wsRef = useRef<WS>();
-  const convId = useMemo(() => {
-    const curr = convList?.[msgIndex];
-    if (curr?.status === 'waiting') {
-      setWaiting(true);
-    }
-    return curr?.conv_id;
-  }, [convList, msgIndex])
   const [chatting, waiting, end] = useMemo(() => {
     const map: Status[] = ['chatting', 'waiting', 'end']
     return map.map(status => convList?.filter(c => c?.status === status));
@@ -103,12 +96,13 @@ const ImService: React.FC = () => {
     }, login);
     setMessage('');
   }
-  const selectItem = (i: number) => {
-    setIndex(i);
+  const selectItem = (info: convItem) => {
+    const { conv_id, status } = info
+    setConvid(conv_id);
+    setWaiting(status === 'waiting')
   }
 
   const checkin = async () => {
-    console.log(123);
     const service_token = sessionStorage.getItem('service_token');
     if (service_token) {
       const res = await acceptConversation(convId, service_token);
@@ -188,8 +182,8 @@ const ImService: React.FC = () => {
               <ServiceItem
                 {...c}
                 key={c?.conv_id}
-                active={index === msgIndex}
-                onSelect={() => selectItem(index)}
+                active={c?.conv_id === convId}
+                onSelect={() => selectItem(c)}
               />
             ))
           ) : (
@@ -203,8 +197,8 @@ const ImService: React.FC = () => {
               <ServiceItem
                 {...c}
                 key={c?.conv_id}
-                active={index === msgIndex}
-                onSelect={() => selectItem(index)}
+                active={c?.conv_id === convId}
+                onSelect={() => selectItem(c)}
               />
             ))
           ) : (
@@ -218,8 +212,8 @@ const ImService: React.FC = () => {
               <ServiceItem
                 {...c}
                 key={c?.conv_id}
-                active={index === msgIndex}
-                onSelect={() => selectItem(index)}
+                active={c?.conv_id === convId}
+                onSelect={() => selectItem(c)}
               />
             ))
           ) : (
@@ -230,7 +224,7 @@ const ImService: React.FC = () => {
       <div className={cx('main')}>
         <div className={cx('window')} id="window">
           {messages?.map((m) => (
-            <Message {...m} rightRole="be_helper" />
+            <Message {...m} rightRole="be_helper" key={m?.message_id} />
           ))}
         </div>
         {waitStatus ? (

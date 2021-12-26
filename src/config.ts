@@ -32,3 +32,8 @@ export const searchCategory = [
   { value: "ZWGK", name: "政务公开" },
   { value: "ZMHD", name: "政民互动" },
 ]
+
+export const imHost = 'https://asueeer.com';
+export const searchHost = 'http://10.13.56.36:8080';
+
+export const welcomeMsg = '欢迎使用智能客服，请发送您的问题。\n可以发送“人工”申请人工客服接入';

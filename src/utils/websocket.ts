@@ -1,3 +1,4 @@
+const host = 'wss://asueeer.com'
 class WS {
   ws?: WebSocket;
   cbs: Record<string, ((msg: any) => void)[]>;
@@ -5,9 +6,9 @@ class WS {
   constructor(auth_token?: string) {
     const service_token = sessionStorage.getItem('service_token');
     if (auth_token) {
-      this.ws = new WebSocket(`ws://47.104.186.111:1988/api/im/ws?auth_token=${auth_token}`)
+      this.ws = new WebSocket(`${host}/ws?auth_token=${auth_token}`)
     } else if (service_token) {
-      this.ws = new WebSocket(`ws://47.104.186.111:1988/api/im/ws?auth_token=${service_token}`);
+      this.ws = new WebSocket(`${host}/ws?auth_token=${service_token}`);
     }
     this.init();
     this.interval = null;

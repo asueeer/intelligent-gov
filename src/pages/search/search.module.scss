@@ -1,20 +1,31 @@
 .page {
   background: #F6F7FA;
 }
+
+.im-service {
+  position: fixed;
+  right: 24px;
+  bottom: 40px;
+  z-index: 99;
+}
+
 .flex__wrapper {
   position: relative;
 }
+
 .focus {
   .padding {
     padding-bottom: 10%;
   }
 }
+
 .padding {
   height: 0;
   width: 100%;
   padding-bottom: 100vh;
   transition: padding-bottom .6s ease-in-out;
 }
+
 .content {
   position: absolute;
   top: 0;
@@ -22,6 +33,7 @@
   width: 100%;
   bottom: 0;
 }
+
 .header {
   max-height: 999px;
   height: 100%;
@@ -33,13 +45,16 @@
   justify-content: center;
   align-items: center;
 }
+
 .header__img {
   width: 100%;
-  filter:drop-shadow(125px 250px 250px rgba(26, 58, 70, 0.7));
+  filter: drop-shadow(125px 250px 250px rgba(26, 58, 70, 0.7));
 }
+
 .focus .header__img {
   filter: blur(5px);
 }
+
 .search__wrapper {
   position: absolute;
   width: 60%;
@@ -49,10 +64,12 @@
   box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, .4);
   transition: top .6s ease;
   z-index: 99;
+
   &.focus {
     top: 76px;
   }
 }
+
 .search {
   height: 48px;
   display: flex;
@@ -66,10 +83,12 @@
   text-align: center;
   outline: 1px solid #0168b7;
 }
+
 .input {
   height: 100%;
   flex-grow: 1;
 }
+
 .input_el {
   background: transparent;
   box-sizing: border-box;
@@ -80,6 +99,7 @@
   text-align: left;
   caret-color: #0168b7;
 }
+
 .button {
   opacity: .8;
   background-color: #0168b7;
@@ -90,19 +110,23 @@
   cursor: pointer;
   text-decoration: none;
 }
+
 .recommends {
   max-height: 0;
   overflow: hidden;
   box-sizing: border-box;
   transition: max-height .6s ease;
+
   &.show {
     max-height: 999px;
   }
 }
+
 .search-common {
   background: rgba(255, 255, 255, .9);
   z-index: 9;
 }
+
 .query {
   font-size: 20px;
   line-height: 32px;
@@ -112,6 +136,7 @@
   text-decoration: none;
   cursor: pointer;
 }
+
 .right {
   width: 40%;
   position: absolute;
@@ -119,12 +144,14 @@
   right: 0;
   border-left: 1px solid #666;
 }
+
 .result__wrapper {
   width: 60%;
   padding-top: 20px;
   margin-top: 56px;
   margin-left: 60px;
 }
+
 .result {
   padding: 20px;
   text-decoration: none;
@@ -132,18 +159,22 @@
   display: block;
   position: relative;
 }
+
 .link {
   cursor: pointer;
-  &:hover { 
+
+  &:hover {
     text-decoration: underline;
   }
 }
+
 .title {
   font-size: 20px;
   font-weight: 500;
   display: flex;
   align-items: start;
 }
+
 .category {
   display: inline-block;
   white-space: nowrap;
@@ -155,19 +186,23 @@
   left: 0;
   top: 0;
 }
+
 .detail {
   margin-top: 12px;
   font-size: 15px;
   line-height: 26px;
 }
+
 mark {
   background: transparent;
   color: #0168b7;
 }
+
 .time {
   color: #666;
   margin-top: 8px;
 }
+
 .service {
   line-height: 22px;
   padding: 5px 10px;

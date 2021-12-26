@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Loading, Pagination } from '../../components';
 import Selectors from './Selectors';
 import classnames from 'classnames/bind';
@@ -124,13 +125,14 @@ const Search: React.FC = () => {
 
   return (
     <div className={cx('page')}>
+      <Link className={cx('service', 'im-service')} to="/im">客服</Link>
       <div className={cx('flex__wrapper', { focus: inputFocus || query })}>
         <div className={cx('padding')}></div>
         <div className={cx('content')}>
           <div className={cx('header')}>
             <img
               className={cx('header__img')}
-              src="http://up.deskcity.org/pic_source/47/13/c7/4713c7b9f10db60652874a6bc1d79b73.jpg"
+              src="/bg.jpeg"
               alt=""
             />
           </div>

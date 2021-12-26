@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Redirect, Route } from 'react-router-dom';
 import { setVisitorId } from './utils/fingerprint';
 import './index.css';
 import Search from './pages/search';

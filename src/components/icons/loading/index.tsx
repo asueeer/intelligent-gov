@@ -1,9 +1,5 @@
 import React from 'react';
-interface IICon {
-  color: string;
-  height?: number;
-  width?: number;
-}
+
 const IconLoading: React.FC<IICon> = prop => {
   const { color, height = 48, width = 48 } = prop;
 

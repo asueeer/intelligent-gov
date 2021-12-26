@@ -6,13 +6,16 @@
   background-color: $bgColor;
   position: relative;
   box-shadow: rgba(0, 0, 0, 0.1) 0 0 5px;
+
   &.active {
-    background-color: darken($bgColor, 5%);
+    background-color: darken($bgColor, 15%);
   }
+
   &:hover {
-    background-color: darken($bgColor, 5%);
+    background-color: darken($bgColor, 15%);
   }
 }
+
 .alert {
   color: #FFF;
   font-size: 12px;
@@ -28,18 +31,21 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
 .title {
   font-size: 18px;
   line-height: 28px;
   font-weight: 600;
   @include clamp;
 }
+
 .abstract {
   font-size: 14px;
   line-height: 20px;
   margin-top: 6px;
   @include clamp;
 }
+
 .time {
   position: absolute;
   bottom: 12px;
