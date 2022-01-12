@@ -3,6 +3,7 @@ import classnames from 'classnames/bind'
 import style from './im.module.scss'
 import Message, {IMessage} from '../../components/Message'
 import {
+  loadMessage,
   loadMessageList,
   loadServiceMessage,
   sendServiceMessage,
@@ -32,7 +33,7 @@ const ImService: React.FC = () => {
   const [waitStatus, setWaiting] = useState(false); 
   const wsRef = useRef<WS>();
   const [chatting, waiting, end] = useMemo(() => {
-    const map: Status[] = ['chatting', 'waiting', 'end']
+    const map: Status[] = ['chatting', 'waiting', 'end'];
     return map.map(status => convList?.filter(c => c?.status === status));
   }, [convList])
 
@@ -41,26 +42,6 @@ const ImService: React.FC = () => {
     const res = await loadMessageList(token);
     if (Array.isArray(res?.data?.conversations)) {
       setList(res?.data?.conversations);
-      wsRef.current = new WS();
-      wsRef.current.on('101', (res) => {
-        const { content, conv_id } = res;
-        setList((l) =>
-          l.map((c) =>
-            c.conv_id === conv_id
-              ? {
-                  ...c,
-                  last_msg: {
-                    ...c.last_msg,
-                    content,
-                  },
-                }
-              : c
-          )
-        );
-      });
-      wsRef.current.on('102', (res) => {
-        setList((l) => [...l, res]);
-      });
     }
   };
 
@@ -115,7 +96,7 @@ const ImService: React.FC = () => {
 
   useEffect(() => {
     if (convId) {
-      loadServiceMessage(convId, 0, login).then((res) => {
+      loadServiceMessage(convId).then((res) => {
         if (Array.isArray(res?.data?.messages)) {
           setMessages(res?.data?.messages);
         }
@@ -138,7 +119,28 @@ const ImService: React.FC = () => {
   useEffect(() => {
     const auth_token = sessionStorage.getItem('service_token');
     if (auth_token) {
-      fetchConvList(auth_token);
+      fetchConvList(auth_token).then(() => {
+        wsRef.current = new WS();
+        wsRef.current.on('101', (res) => {
+          const { content, conv_id } = res;
+          setList((l) =>
+            l.map((c) =>
+              c.conv_id === conv_id
+                ? {
+                    ...c,
+                    last_msg: {
+                      ...c.last_msg,
+                      content,
+                    },
+                  }
+                : c
+            )
+          );
+        });
+        wsRef.current.on('102', (res) => {
+          setList((l) => [...l, res]);
+        });
+      });
     }
     return () => {
       wsRef.current?.close();

@@ -36,4 +36,4 @@ export const searchCategory = [
 export const imHost = 'https://asueeer.com';
 export const searchHost = 'http://10.13.56.36:8080';
 
-export const welcomeMsg = '欢迎使用智能客服，请发送您的问题。\n可以发送“人工”申请人工客服接入';
+export const welcomeMsg = '欢迎使用智能客服，请发送您的问题。';

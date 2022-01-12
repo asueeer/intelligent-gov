@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import style from './message.module.scss'
 
 const cx = classnames.bind(style)
-type contentType = 'text' | 'image' | 'rich_text' | 'audio' | 'video';
+type contentType = 'text' | 'image' | 'rich_text' | 'audio' | 'video' | 'question';
 type roleType = 'visitor' | 'be_helper' | 'sys_helper';
 export interface IMessage {
   message_id?: string;
@@ -16,6 +16,16 @@ export interface IMessage {
     rich_text?: string;
     audio?: string;
     video?: string;
+    // 选择题类型
+    question?: {
+      title: string; // 题目
+      // value: number | boolean | string;
+      options: Array<{
+        label: string;
+        value: number | boolean | string;
+      }>
+      more: 'input'
+    };
   };
   timestamp: number;
   rightRole?: roleType;

@@ -123,6 +123,12 @@ export const sendMessage = async (params: { type: messageType; conv_id: string; 
     method: 'POST'
   })
 }
+// 转人工
+export const transArti = (conv_id: string) => sendRequest(`/api/im/trans_to_arti_conversation?auth_token=${sessionStorage.getItem('auth_token')}`, {
+  conv_id
+}, {
+  method: 'POST'
+});
 // 发送机器人消息
 export const sendRobot: (params: { content: any }) => Promise<{data: {resp_content: string}}> = async ({ content }) =>
   sendRequest(`https://asueeer.com/api/im/send_robot?auth_token=${sessionStorage.getItem('auth_token')}`, {
@@ -142,9 +148,10 @@ export const loadMessage = (conv_id: string, cursor: number) => sendRequest(`/ap
   method: 'POST',
 })
 // 加载客服历史会话
-export const loadServiceMessage = (conv_id: string, cursor: number, service_token: string) => sendRequest(`/api/im/load_conversation_detail?auth_token=${service_token}`, {
+export const loadServiceMessage = (conv_id: string) => sendRequest(`/api/im/load_conversation_detail?auth_token=${sessionStorage.getItem('service_token')}`, {
   conv_id,
-  cursor: `${cursor}`,
+  direction: -1,
+  cursor: `${Date.now()}`,
   limit: 10
 }, {
   method: 'POST',

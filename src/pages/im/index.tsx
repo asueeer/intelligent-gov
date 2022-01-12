@@ -10,6 +10,7 @@ import {
   createConversation,
   sendMessage,
   loadMessage,
+  transArti,
 } from '../../services/api';
 import { welcomeMsg } from '../../config'
 import WS from '../../utils/websocket';
@@ -43,35 +44,44 @@ const Im: React.FC = () => {
 
   const callService = useCallback(async () => {
     const res = await createConversation();
+    let msg = '暂无客服，请稍后重试';
     if (res?.data?.conv_id) {
       localStorage.setItem('conv_id', res?.data?.conv_id);
-      setMessages((ms) => [
-        ...ms,
-        {
-          role: 'sys_helper',
-          content: {
-            text: '已为您转接人工客服，请等待客服接待...',
-          },
-          timestamp: Date.now(),
-          type: 'text',
-        },
-      ]);
       setConvId(res?.data?.conv_id);
-      setChatting(true);
-    } else {
-      setMessages((ms) => [
-        ...ms,
-        {
-          role: 'sys_helper',
-          content: {
-            text: '暂无客服，请稍后重试',
-          },
-          timestamp: Date.now(),
-          type: 'text',
-        },
-      ]);
+      msg = '智能机器人为您服务中，如需人工服务请输入“人工”'
     }
+    setMessages((ms) => [
+      ...ms,
+      {
+        role: 'sys_helper',
+        content: {
+          text: msg,
+        },
+        timestamp: Date.now(),
+        type: 'text',
+      },
+    ]);
   }, [setMessages, setConvId]);
+
+  const callIMService = useCallback(async () => {
+    if (convId) {
+      const res = await transArti(convId);
+      if (res?.meta?.code === 0) {
+        setChatting(true);
+        setMessages((ms) => [
+          ...ms,
+          {
+            role: 'sys_helper',
+            content: {
+              text: '已为您转接人工客服，请等待客服接待...',
+            },
+            timestamp: Date.now(),
+            type: 'text',
+          },
+        ]);
+      }
+    }
+  }, [convId])
 
   const send = useCallback(async () => {
     if (message) {
@@ -83,40 +93,31 @@ const Im: React.FC = () => {
         timestamp: Date.now(),
         type: 'text',
       });
-      if (convId && inChatting) {
-        await sendMessage({
-          type: 'text',
-          content: {
-            text: message,
-          },
-          conv_id: convId,
-        });
+      if (!convId) {
+        await callService();
       } else {
-        switch (message) {
-          case '人工':
-            callService();
-            break;
-          default: {
-            const res = await sendRobot({ content: message });
-            if (res?.data) {
-              setMessages((ms) => [
-                ...ms,
-                {
-                  role: 'sys_helper',
-                  type: 'text',
-                  content: {
-                    text: res?.data?.resp_content,
-                  },
-                  timestamp: Date.now(),
-                },
-              ]);
+        if (inChatting) {
+          await sendMessage({
+            type: 'text',
+            content: {
+              text: message,
+            },
+            conv_id: convId,
+          });
+        } else {
+          switch (message) {
+            case '人工':
+              callIMService();
+              break;
+            default: {
+              await sendMessage({ content: message, type: 'text', conv_id: convId });
             }
           }
         }
       }
       setMessage('');
     }
-  }, [callService, setMessage, setMessages, convId, inChatting, messages, message]);
+  }, [callService, callIMService, setMessage, setMessages, convId, inChatting, messages, message]);
 
   const inputVoice = () => {
     window.startRecording();

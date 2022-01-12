@@ -35,7 +35,6 @@ const Search: React.FC = () => {
       }
       timer.current = setTimeout(() => {
         getQuerySuggestion(query).then((res) => {
-          console.warn(res);
           setList(res?.results)
         });
       }, 500);
@@ -63,6 +62,7 @@ const Search: React.FC = () => {
           query,
           suggestion: input,
         });
+        setQuery(input);
       } else {
         log.send('search_query', {
           query,
@@ -103,6 +103,7 @@ const Search: React.FC = () => {
   }, [query]);
 
   useEffect(() => {
+    document.title = '智能搜索';
     search(query);
   }, [page]);
 
@@ -184,7 +185,7 @@ const Search: React.FC = () => {
                 target="_blank"
               >
                 <div className={cx('title')}>
-                  {res?.category && (<div className={cx('category')}>{res?.category}</div>)}
+                  {res?.category && (<div className={cx('category')}>{res?.category?.split(';')?.[0]}</div>)}
                   <span
                     className={cx('link')}
                     dangerouslySetInnerHTML={{ __html: res?.title }}
