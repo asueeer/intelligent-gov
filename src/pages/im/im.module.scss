@@ -33,21 +33,6 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0 0 5px;
 }
 
-.input-audio {
-  display: flex;
-  align-items: center;
-  padding: 6px 12px;
-  white-space: nowrap;
-  cursor: pointer;
-  margin-right: 12px;
-  outline: 1px solid #0168b7;
-  border-radius: 18px;
-
-  &:hover {
-    outline: 2px solid #0168b7;
-  }
-}
-
 .input-box {
   width: 70%;
   flex-grow: 1;

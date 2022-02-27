@@ -2,13 +2,6 @@
   background: #F6F7FA;
 }
 
-.im-service {
-  position: fixed;
-  right: 24px;
-  bottom: 40px;
-  z-index: 99;
-}
-
 .flex__wrapper {
   position: relative;
 }
@@ -57,6 +50,7 @@
 
 .search__wrapper {
   position: absolute;
+  display: flex;
   width: 60%;
   top: 50%;
   left: 20vw;
@@ -215,4 +209,14 @@ mark {
   position: absolute;
   right: 20px;
   bottom: 20px;
+}
+
+.im-service {
+  position: fixed;
+  right: 24px;
+  bottom: 40px;
+  padding: 8px 13px;
+  z-index: 99;
+  font-size: 20px;
+  font-weight: bold;
 }

@@ -34,6 +34,6 @@ export const searchCategory = [
 ]
 
 export const imHost = 'https://asueeer.com';
-export const searchHost = 'http://10.13.56.36:8080';
+export const searchHost = 'https://burninghell.xicp.net';
 
 export const welcomeMsg = '欢迎使用智能客服，请发送您的问题。';

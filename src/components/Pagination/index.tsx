@@ -14,14 +14,16 @@ const Pagination: React.FC<IPagination> = prop => {
   const { total, current, jump } = prop;
   const list = useMemo<number[]>(() => {
     let start = current;
-    if (current < 5) {
-      start = 1;
-    } else if (current > 5 && current + 4 < total) {
-      start = current - 5;
+    if (total > 10) {
+      if (total - current > 4) {
+        start = current - 5 > 0 ? current - 5 : 1;
+      } else {
+        start = total - 9;
+      }
+      return new Array(10).fill('').map((_, index) => index + start);
     } else {
-      start = total - 9;
+      return new Array(total).fill('').map((_, index) => index + 1);
     }
-    return new Array(Math.min(10, total)).fill('').map((_, index) => index + start);
   }, [current, total]);
 
   return (

@@ -3,7 +3,7 @@ import { useEventListener } from 'ahooks';
 import classnames from 'classnames/bind';
 import style from './im.module.scss';
 import Message, { IMessage } from '../../components/Message';
-import { IconMicrophone } from '../../components/icons';
+import InputVoice from '../../components/InputVoice';
 import {
   getImToken,
   sendRobot,
@@ -28,7 +28,6 @@ const Im: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [convId, setConvId] = useState<string>('');
   const [inChatting, setChatting] = useState<boolean>(false);
-  const [voiceStatus, setVoice] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<IMessage[]>([
     {
@@ -110,7 +109,9 @@ const Im: React.FC = () => {
               callIMService();
               break;
             default: {
-              await sendMessage({ content: message, type: 'text', conv_id: convId });
+              await sendMessage({ content: {
+                text: message
+              }, type: 'text', conv_id: convId });
             }
           }
         }
@@ -118,20 +119,6 @@ const Im: React.FC = () => {
       setMessage('');
     }
   }, [callService, callIMService, setMessage, setMessages, convId, inChatting, messages, message]);
-
-  const inputVoice = () => {
-    window.startRecording();
-    setVoice(1);
-  };
-
-  const stopVoice = async () => {
-    setVoice(2);
-    const res = await window.stopRecording();
-    if (res?.code === 0) {
-      setMessage(res?.data);
-    }
-    setVoice(0);
-  };
 
   useEventListener('keypress', (e) => {
     if (e?.key === 'Enter') {
@@ -197,22 +184,7 @@ const Im: React.FC = () => {
         ))}
       </div>
       <div className={cx('input__wrapper')}>
-        <div
-          className={cx('input-audio')}
-          onMouseDown={inputVoice}
-          onMouseUp={stopVoice}
-        >
-          <IconMicrophone
-            color={voiceStatus === 0 ? '#2c2c2c' : '#0168b7' }
-            width={24}
-            height={24}
-          />
-          {voiceStatus === 0
-            ? '按住录音'
-            : voiceStatus === 2
-            ? '解析中'
-            : '输入中'}
-        </div>
+        <InputVoice getText={text => setMessage(text)} />
         <input
           ref={inputRef}
           className={cx('input-box')}

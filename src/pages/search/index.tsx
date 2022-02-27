@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Loading, Pagination } from '../../components';
 import Selectors from './Selectors';
+import InputVoice from '../../components/InputVoice';
 import classnames from 'classnames/bind';
 import dayjs from 'dayjs';
 
@@ -52,26 +53,25 @@ const Search: React.FC = () => {
     setInputFocus(false);
   }
 
-  const search = (input: string, select?: boolean) => {
-    if (query) {
-      setLoading(true);
-      setList([]);
-      setTotalPage(0);
-      if (select) {
-        log.send('pick_suggestion', {
-          query,
-          suggestion: input,
-        });
-        setQuery(input);
-      } else {
-        log.send('search_query', {
-          query,
-        });
-      }
+  const search = useCallback((input?: string, select?: boolean) => {
+    if (!input && !query) {
+      return;
+    }
+    if (select && input) {
+      setQuery(input);
+      log.send('pick_suggestion', {
+        query,
+        suggestion: input,
+      });
+    } else if (query) {
+      log.send('search_query', {
+        query,
+      });
+    }
       getSearchResult({
-        query: input, // FIXME:
-        input,
-        select: select ? input : '',
+        query: input || query, // FIXME:
+        input: input || '',
+        select: select ? input || '' : '',
         webID: String(localStorage.getItem('visitorId')),
         page_number: page,
         type,
@@ -85,8 +85,7 @@ const Search: React.FC = () => {
           setLoading(false);
         }
       });
-    }
-  };
+    },[query, category, params, type, page]);
 
   const clickResult = (detail: any) => {
     const { title, category, department, serviceLink } = detail;
@@ -105,15 +104,12 @@ const Search: React.FC = () => {
   useEffect(() => {
     document.title = '智能搜索';
     search(query);
-  }, [page]);
+  }, []);
 
   useEffect(() => {
-    if (page !== 1) {
       setPage(1);
-    } else {
-      search(query);
-    }
-  }, [params, type]);
+      search();
+  }, [params, type, search]);
 
   const pickParam = (name: string, value: string | number) => {
     setParams((p) => ({ ...p, [name]: value }));
@@ -138,6 +134,7 @@ const Search: React.FC = () => {
             />
           </div>
           <div className={cx('search__wrapper')}>
+            <InputVoice getText={text => setQuery(text)} />
             <div className={cx('search', 'search-common')}>
               <div className={cx('input')}>
                 <input
