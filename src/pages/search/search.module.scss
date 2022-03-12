@@ -72,6 +72,7 @@
   position: relative;
   align-items: center;
   justify-content: space-between;
+  padding-left: 8px;
   font-size: 24px;
   overflow: hidden;
   text-align: center;
@@ -92,6 +93,7 @@
   width: 100%;
   text-align: left;
   caret-color: #0168b7;
+  padding-left: 2px;
 }
 
 .button {
@@ -110,6 +112,9 @@
   overflow: hidden;
   box-sizing: border-box;
   transition: max-height .6s ease;
+  position: absolute;
+  top: 48px;
+  width: 100%;
 
   &.show {
     max-height: 999px;
@@ -183,7 +188,7 @@
 
 .detail {
   margin-top: 12px;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 26px;
 }
 
@@ -219,4 +224,61 @@ mark {
   z-index: 99;
   font-size: 20px;
   font-weight: bold;
+}
+
+.more__setting {
+  z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(#000000, .6);
+  text-align: center;
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+    z-index: 199;
+  }
+}
+
+.setting {
+  border-radius: 12px;
+  background-color: #FFF;
+  padding: 20px;
+  margin: 20% 64px;
+  display: inline-block;
+
+  .button {
+    border-radius: 8px;
+    font-size: 20px;
+  }
+}
+
+.setting__header {
+  font-size: 24px;
+}
+
+.setting__form {
+  padding: 16px;
+}
+
+.setting__item {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.setting__labal {
+  text-align: right;
+  width: 170px;
+  margin-right: 8px;
+}
+
+.setting__value {
+  width: 280px;
+  border: 1px solid #222;
+  padding: 4px;
+  border-radius: 4px;
 }

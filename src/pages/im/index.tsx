@@ -148,6 +148,10 @@ const Im: React.FC = () => {
       wsRef.current.on('101', (res) => {
         setMessages((ms) => [...ms, res]);
       });
+      wsRef.current.on('105', (res) => {
+        setMessages((ms) => [...ms, res]);
+        setMessage('是');
+      })
       wsRef.current.on('103', () => {
         setMessages((ms) => [
           ...ms,

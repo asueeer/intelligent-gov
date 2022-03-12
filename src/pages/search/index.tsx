@@ -26,6 +26,7 @@ const Search: React.FC = () => {
   const [category, setCategory] = useState<string>('ALL'); // TODO: select cate
   const [type, setType] = useState<string>('ALL');
   const [page, setPage] = useState<number>(1);
+  const [showPannel, setShowPannel] = useState<boolean>(false);
   const [totalPage, setTotalPage] = useState<number>(0);
   const timer = useRef<NodeJS.Timeout>();
 
@@ -83,9 +84,10 @@ const Search: React.FC = () => {
           setResult(list as Array<any>);
           setTotalPage(Math.ceil(total / 10));
           setLoading(false);
+          document.scrollingElement?.scrollTo?.({ top: 0 })
         }
       });
-    },[query, category, params, type, page]);
+    },[page, query]);
 
   const clickResult = (detail: any) => {
     const { title, category, department, serviceLink } = detail;
@@ -97,19 +99,26 @@ const Search: React.FC = () => {
     });
   }
 
+  const searchWithSetting = () => {
+    console.warn('form data');
+  }
+
   useEffect(() => {
     checkSuggestion();
   }, [query]);
 
   useEffect(() => {
     document.title = '智能搜索';
-    search(query);
   }, []);
 
   useEffect(() => {
       setPage(1);
       search();
-  }, [params, type, search]);
+  }, [category, params, type]);
+
+  useEffect(() => {
+    search();
+  }, [page])
 
   const pickParam = (name: string, value: string | number) => {
     setParams((p) => ({ ...p, [name]: value }));
@@ -122,6 +131,40 @@ const Search: React.FC = () => {
 
   return (
     <div className={cx('page')}>
+      <div className={cx('more__setting', { show: showPannel })}>
+        <div className={cx('setting')}>
+          <div className={cx('setting__header')}>高级搜索设置</div>
+          <div className={cx('setting__form')}>
+            <div className={cx('setting__item')}>
+              <div className={cx('setting__labal')}>包含检索词</div>
+              <div className={cx('setting__value')}>
+                <input className={cx('input_el')} />
+              </div>
+            </div>
+            <div className={cx('setting__item')}>
+              <div className={cx('setting__labal')}>包含至少一个检索词</div>
+              <div className={cx('setting__value')}>
+                <input className={cx('input_el')} />
+              </div>
+            </div>
+            <div className={cx('setting__item')}>
+              <div className={cx('setting__labal')}>不包含检索词</div>
+              <div className={cx('setting__value')}>
+                <input className={cx('input_el')} />
+              </div>
+            </div>
+            <div className={cx('setting__item')}>
+              <div className={cx('setting__labal')}>检索位置</div>
+              <div className={cx('setting__value')}>
+                <input type="radio" checked name="全部" value="ALL" /><span>全部</span>
+                <input type="radio" name="标题" value="TITLE" /><span>标题</span>
+                <input type="radio" name="正文" value="FULLTEXT" /><span>正文</span>
+              </div>
+            </div>
+          </div>
+          <div className={cx('button')} onClick={searchWithSetting}>确认</div>
+        </div>
+      </div>
       <Link className={cx('service', 'im-service')} to="/im">客服</Link>
       <div className={cx('flex__wrapper', { focus: inputFocus || query })}>
         <div className={cx('padding')}></div>
@@ -134,8 +177,8 @@ const Search: React.FC = () => {
             />
           </div>
           <div className={cx('search__wrapper')}>
-            <InputVoice getText={text => setQuery(text)} />
             <div className={cx('search', 'search-common')}>
+              <InputVoice getText={text => setQuery(text)} />
               <div className={cx('input')}>
                 <input
                   className={cx('input_el', 'query')}
@@ -147,6 +190,9 @@ const Search: React.FC = () => {
               </div>
               <div className={cx('button')} onClick={() => search(query)}>
                 搜索
+              </div>
+              <div className={cx('button')} onClick={() => setShowPannel(true)}>
+                高级搜索
               </div>
             </div>
             <div
