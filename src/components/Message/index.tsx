@@ -16,6 +16,7 @@ export interface IMessage {
     rich_text?: string;
     audio?: string;
     video?: string;
+    link?: string;
     // 选择题类型
     question?: {
       title: string; // 题目
@@ -56,6 +57,7 @@ const Message: React.FC<IMessage> = prop => {
       </div>
       <div className={cx('bubble')}>
         <Content type={type} content={content?.[type] as string} />
+        {content?.link && <a href={content.link} className={cx('link')}>办理服务</a>}
         <div className={cx('time')}>
           {dayjs(timestamp).format('YYYY-MM-DD HH:mm')}
         </div>
