@@ -58,6 +58,9 @@ const Search: React.FC = () => {
     if (!input && !query) {
       return;
     }
+    if (input) {
+      setPage(1);
+    }
     if (select && input) {
       setQuery(input);
       log.send('pick_suggestion', {
@@ -69,25 +72,25 @@ const Search: React.FC = () => {
         query,
       });
     }
-      getSearchResult({
-        query: input || query, // FIXME:
-        input: input || '',
-        select: select ? input || '' : '',
-        webID: String(localStorage.getItem('visitorId')),
-        page_number: page,
-        type,
-        category,
-        ...params,
-      }).then((res) => {
-        const { list, total } = res?.data;
-        if (list?.length) {
-          setResult(list as Array<any>);
-          setTotalPage(Math.ceil(total / 10));
-          setLoading(false);
-          document.scrollingElement?.scrollTo?.({ top: 0 })
-        }
-      });
-    },[page, query]);
+    getSearchResult({
+      query: input || query, // FIXME:
+      input: input || '',
+      select: select ? input || '' : '',
+      webID: String(localStorage.getItem('visitorId')),
+      page_number: input ? 1 : page,
+      type,
+      category,
+      ...params,
+    }).then((res) => {
+      const { list, total } = res?.data;
+      if (list?.length) {
+        setResult(list as Array<any>);
+        setTotalPage(Math.ceil(total / 10));
+        setLoading(false);
+        document.scrollingElement?.scrollTo?.({ top: 0 })
+      }
+    });
+    },[page, query, params, category, type]);
 
   const clickResult = (detail: any) => {
     const { title, category, department, serviceLink } = detail;
@@ -112,10 +115,8 @@ const Search: React.FC = () => {
   }, []);
 
   useEffect(() => {
-      setPage(1);
-      search();
-  }, [category, params, type]);
-
+    search(query);
+  }, [category, type, params])
   useEffect(() => {
     search();
   }, [page])

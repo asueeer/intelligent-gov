@@ -29,6 +29,7 @@ const Im: React.FC = () => {
   const [convId, setConvId] = useState<string>('');
   const [inChatting, setChatting] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const winRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<IMessage[]>([
     {
       role: 'sys_helper',
@@ -41,13 +42,24 @@ const Im: React.FC = () => {
   ]);
   const wsRef = useRef<WS>();
 
+  const scroll = useCallback(() => {
+    if (winRef.current) {
+      const top = winRef.current?.scrollHeight - winRef.current?.clientHeight;
+      if (!isNaN(Number(top))) {
+        winRef.current.scrollTo({
+          top,
+        });
+      }
+    }
+  }, [winRef])
+
   const callService = useCallback(async () => {
     const res = await createConversation();
     let msg = '暂无客服，请稍后重试';
     if (res?.data?.conv_id) {
       localStorage.setItem('conv_id', res?.data?.conv_id);
       setConvId(res?.data?.conv_id);
-      msg = '智能机器人为您服务中，如需人工服务请输入“人工”'
+      msg = '智能机器人为您服务中，请输入您的问题，如需人工服务请输入“人工”'
     }
     setMessages((ms) => [
       ...ms,
@@ -117,8 +129,9 @@ const Im: React.FC = () => {
         }
       }
       setMessage('');
+      scroll();
     }
-  }, [callService, callIMService, setMessage, setMessages, convId, inChatting, messages, message]);
+  }, [callService, callIMService, setMessage, convId, inChatting, messages, message, scroll]);
 
   useEventListener('keypress', (e) => {
     if (e?.key === 'Enter') {
@@ -168,21 +181,13 @@ const Im: React.FC = () => {
     }
   }, [convId]);
   useEffect(() => {
-    const win = document.querySelector('#window');
-    if (win) {
-      const top = win?.scrollHeight - win?.clientHeight;
-      if (!isNaN(Number(top))) {
-        win.scrollTo({
-          top,
-        });
-      }
-    }
-  }, [messages]);
+    scroll();
+  }, [messages, scroll]);
 
   return (
     <div className={cx('im')}>
       <div className={cx('header')}>智能客服</div>
-      <div className={cx('window')} id="window">
+      <div className={cx('window')} id="window" ref={winRef}>
         {messages?.map((m) => (
           <Message {...m} key={m?.message_id} />
         ))}
@@ -194,7 +199,6 @@ const Im: React.FC = () => {
           className={cx('input-box')}
           value={message}
           onChange={({ target }) => setMessage(target?.value)}
-          
         />
         <div className={cx('input-button')} onClick={send}>
           发送

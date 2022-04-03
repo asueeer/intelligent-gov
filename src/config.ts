@@ -10,7 +10,7 @@ export const searchConfig = [{
     label: '搜索范围',
     list: [
       { value: 'ALL', name: '全部范围' },
-      { value: 'TITLE', name: '标题' }, 
+      { value: 'TITLE', name: '标题' },
       { value: 'FULLTEXT', name: '全文' }
     ]
   }, {
@@ -36,4 +36,4 @@ export const searchCategory = [
 export const imHost = 'https://asueeer.com';
 export const searchHost = 'https://burninghell.xicp.net';
 
-export const welcomeMsg = '欢迎使用智能客服，请发送您的问题。';
+export const welcomeMsg = '欢迎使用智能客服';
