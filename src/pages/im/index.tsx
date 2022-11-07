@@ -94,12 +94,13 @@ const Im: React.FC = () => {
     }
   }, [convId])
 
-  const send = useCallback(async () => {
-    if (message) {
+  const send = useCallback(async (msg?: string) => {
+    const sendText = msg || message;
+    if (sendText) {
       messages.push({
         role: 'visitor',
         content: {
-          text: message,
+          text: sendText,
         },
         timestamp: Date.now(),
         type: 'text',
@@ -111,18 +112,20 @@ const Im: React.FC = () => {
           await sendMessage({
             type: 'text',
             content: {
-              text: message,
+              text: sendText,
+              service_name: msg || ''
             },
             conv_id: convId,
           });
         } else {
-          switch (message) {
+          switch (sendText) {
             case '人工':
               callIMService();
               break;
             default: {
+              const key = msg ? 'service_name' : 'text';
               await sendMessage({ content: {
-                text: message
+                [key]: sendText
               }, type: 'text', conv_id: convId });
             }
           }
@@ -163,7 +166,6 @@ const Im: React.FC = () => {
       });
       wsRef.current.on('105', (res) => {
         setMessages((ms) => [...ms, res]);
-        setMessage('是');
       })
       wsRef.current.on('103', () => {
         setMessages((ms) => [
@@ -189,7 +191,7 @@ const Im: React.FC = () => {
       <div className={cx('header')}>智能客服</div>
       <div className={cx('window')} id="window" ref={winRef}>
         {messages?.map((m) => (
-          <Message {...m} key={m?.message_id} />
+          <Message {...m} key={m?.message_id} send={send} />
         ))}
       </div>
       <div className={cx('input__wrapper')}>
@@ -200,7 +202,7 @@ const Im: React.FC = () => {
           value={message}
           onChange={({ target }) => setMessage(target?.value)}
         />
-        <div className={cx('input-button')} onClick={send}>
+        <div className={cx('input-button')} onClick={() => send()}>
           发送
         </div>
       </div>

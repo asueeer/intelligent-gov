@@ -41,6 +41,7 @@
   margin: 0 8px;
   position: relative;
   height: fit-content;
+  width: fit-content;
 }
 
 .time {
@@ -61,4 +62,18 @@
 .link {
   color: #0168b7;
   text-decoration: underline;
+}
+
+.select {
+  display: flex;
+}
+.opt {
+  margin: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid $bgColor;
+  cursor: pointer;
+  &:hover {
+    background: $bgColor;
+  }
 }
