@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter, Redirect, Route } from 'react-router-dom';
 import { setVisitorId } from './utils/fingerprint';
+import '@arco-design/web-react/dist/css/arco.css';
 import './index.css';
 import Search from './pages/search';
 import Im from './pages/im';

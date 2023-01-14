@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useEventListener } from 'ahooks';
+import { Notification, Button, Input } from '@arco-design/web-react';
 import classnames from 'classnames/bind';
 import style from './im.module.scss';
 import Message, { IMessage } from '../../components/Message';
@@ -30,16 +31,7 @@ const Im: React.FC = () => {
   const [inChatting, setChatting] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const winRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<IMessage[]>([
-    {
-      role: 'sys_helper',
-      content: {
-        text: welcomeMsg,
-      },
-      type: 'text',
-      timestamp: Date.now(),
-    },
-  ]);
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const wsRef = useRef<WS>();
 
   const scroll = useCallback(() => {
@@ -147,6 +139,12 @@ const Im: React.FC = () => {
   })
 
   useEffect(() => {
+    Notification.info({
+      content: welcomeMsg,
+      closable: true,
+      duration: 8000,
+
+    })
     getImToken();
     return () => {
       wsRef.current?.close();
@@ -196,15 +194,8 @@ const Im: React.FC = () => {
       </div>
       <div className={cx('input__wrapper')}>
         <InputVoice getText={text => setMessage(text)} />
-        <input
-          ref={inputRef}
-          className={cx('input-box')}
-          value={message}
-          onChange={({ target }) => setMessage(target?.value)}
-        />
-        <div className={cx('input-button')} onClick={() => send()}>
-          发送
-        </div>
+        <Input size='large' placeholder='请输入问题' value={message} onChange={val => setMessage(val)} />
+        <Button size='large' type='primary' onClick={() => send()}>发送</Button>
       </div>
     </div>
   );

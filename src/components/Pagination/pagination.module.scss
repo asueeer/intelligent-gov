@@ -12,11 +12,11 @@
   min-width: 28px;
   flex-shrink: 0;
   text-align: center;
-  border: 1px solid #0168b7;
+  border: 1px solid #4080ff;
   cursor: pointer;
   border-radius: 6px;
   &.curr {
-    background: #0168b7;
+    background: #4080ff;
     color: #FFF;
   }
 }

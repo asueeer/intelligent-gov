@@ -8,7 +8,7 @@ const Loading = () => {
   return (
     <div className={cx("loading")}>
       <div className={cx("loading__icon")}>
-        <IconLoading color="#0168b7" width={60} height={60} />
+        <IconLoading color="#4080ff" width={60} height={60} />
       </div>
     </div>
   );

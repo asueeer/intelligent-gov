@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@arco-design/web-react": "^2.44.0",
     "@babel/core": "7.12.3",
     "@fingerprintjs/fingerprintjs": "^3.3.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",

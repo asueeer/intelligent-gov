@@ -76,7 +76,7 @@
   font-size: 24px;
   overflow: hidden;
   text-align: center;
-  outline: 1px solid #0168b7;
+  outline: 1px solid #4080ff;
 }
 
 .input {
@@ -92,13 +92,13 @@
   height: 100%;
   width: 100%;
   text-align: left;
-  caret-color: #0168b7;
+  caret-color: #4080ff;
   padding-left: 2px;
 }
 
 .button {
   opacity: .8;
-  background-color: #0168b7;
+  background-color: #4080ff;
   color: #FFF;
   flex-basis: 128px;
   height: 100%;
@@ -178,8 +178,8 @@
   display: inline-block;
   white-space: nowrap;
   font-size: 14px;
-  color: #0168b7;
-  border: 1px solid #0168b7;
+  color: #4080ff;
+  border: 1px solid #4080ff;
   padding: 4px 8px;
   margin-right: 12px;
   left: 0;
@@ -194,7 +194,7 @@
 
 mark {
   background: transparent;
-  color: #0168b7;
+  color: #4080ff;
 }
 
 .time {
@@ -210,7 +210,7 @@ mark {
   font-size: 14px;
   border-radius: 6px;
   color: #FFF;
-  background-color: #0168b7;
+  background-color: #4080ff;
   position: absolute;
   right: 20px;
   bottom: 20px;

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import classnames from 'classnames/bind';
+import { Button } from '@arco-design/web-react';
+import { IconVoice } from '@arco-design/web-react/icon';
 import { IconMicrophone } from '../../components/icons';
 import style from './index.module.scss';
 
@@ -24,22 +26,20 @@ const InputVoice: React.FC<IInputVoice> = ({ getText }) => {
     setVoice(0);
   };
 
+  const text = useMemo(() => voiceStatus === 0
+    ? '按住录音'
+    : voiceStatus === 2
+      ? '解析中'
+      : '输入中', [voiceStatus])
+
   return (
     <div
-        className={cx('input-audio')}
         onMouseDown={inputVoice}
         onMouseUp={stopVoice}
       >
-      <IconMicrophone
-        color={voiceStatus === 0 ? '#2c2c2c' : '#0168b7' }
-        width={24}
-        height={24}
-      />
-      {voiceStatus === 0
-        ? '按住录音'
-        : voiceStatus === 2
-        ? '解析中'
-        : '输入中'}
+      <Button icon={<IconVoice />} size='large' type='outline'>
+        {text}
+      </Button>
     </div>
   )
 }
