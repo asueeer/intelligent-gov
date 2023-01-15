@@ -45,25 +45,27 @@ const Im: React.FC = () => {
     }
   }, [winRef])
 
-  const callService = useCallback(async () => {
+  const callService = useCallback(async (inited?: boolean) => {
     const res = await createConversation();
     let msg = '暂无客服，请稍后重试';
     if (res?.data?.conv_id) {
       localStorage.setItem('conv_id', res?.data?.conv_id);
       setConvId(res?.data?.conv_id);
-      msg = '智能机器人为您服务中，请输入您的问题，如需人工服务请输入“人工”'
+      msg = inited ? '' : '智能机器人为您服务中，请输入您的问题，如需人工服务请输入“人工”';
     }
-    setMessages((ms) => [
-      ...ms,
-      {
-        role: 'sys_helper',
-        content: {
-          text: msg,
+    if (msg) {
+      setMessages((ms) => [
+        ...ms,
+        {
+          role: 'sys_helper',
+          content: {
+            text: msg,
+          },
+          timestamp: Date.now(),
+          type: 'text',
         },
-        timestamp: Date.now(),
-        type: 'text',
-      },
-    ]);
+      ]);
+    }
   }, [setMessages, setConvId]);
 
   const callIMService = useCallback(async () => {
@@ -98,7 +100,7 @@ const Im: React.FC = () => {
         type: 'text',
       });
       if (!convId) {
-        await callService();
+        await callService(true);
       } else {
         if (inChatting) {
           await sendMessage({
@@ -144,7 +146,8 @@ const Im: React.FC = () => {
       closable: true,
       duration: 8000,
 
-    })
+    });
+    callService();
     getImToken();
     return () => {
       wsRef.current?.close();
