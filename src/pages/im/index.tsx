@@ -130,6 +130,11 @@ const Im: React.FC = () => {
     }
   }, [callService, callIMService, setMessage, convId, inChatting, messages, message, scroll]);
 
+  const initConv = async () => {
+    await getImToken();
+    await callService();
+  }
+
   useEventListener('keypress', (e) => {
     if (e?.key === 'Enter') {
       if (message) {
@@ -147,8 +152,7 @@ const Im: React.FC = () => {
       duration: 8000,
 
     });
-    callService();
-    getImToken();
+    initConv();
     return () => {
       wsRef.current?.close();
     };

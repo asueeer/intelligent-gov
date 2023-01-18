@@ -161,6 +161,9 @@
 
 .link {
   cursor: pointer;
+  margin-left: 12px;
+  line-height: 24px;
+  display: inline-block;
 
   &:hover {
     text-decoration: underline;
@@ -168,10 +171,8 @@
 }
 
 .title {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 500;
-  display: flex;
-  align-items: start;
 }
 
 .category {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Tag, Popover } from '@arco-design/web-react';
 import { Link } from 'react-router-dom';
 import { Loading, Pagination } from '../../components';
 import Selectors from './Selectors';
@@ -18,7 +19,7 @@ const log = new Log();
 
 const Search: React.FC = () => {
   const [list, setList] = useState<Array<string>>([]);
-  const [result, setResult] = useState<Array<any>>([]);
+  const [result, setResult] = useState<Array<SearchItem>>([]);
   const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [inputFocus, setInputFocus] = useState<boolean>(false);
@@ -84,7 +85,7 @@ const Search: React.FC = () => {
     }).then((res) => {
       const { list, total } = res?.data;
       if (list?.length) {
-        setResult(list as Array<any>);
+        setResult(list as Array<SearchItem>);
         setTotalPage(Math.ceil(total / 10));
         setLoading(false);
         document.scrollingElement?.scrollTo?.({ top: 0 })
@@ -229,11 +230,17 @@ const Search: React.FC = () => {
                 target="_blank"
               >
                 <div className={cx('title')}>
-                  {res?.category && (<div className={cx('category')}>{res?.category?.split(';')?.[0]}</div>)}
-                  <span
-                    className={cx('link')}
-                    dangerouslySetInnerHTML={{ __html: res?.title }}
-                  ></span>
+                  {res?.category && <Tag color='arcoblue' style={{display: 'inline-block'}}>{res.category?.split(';')?.[0]}</Tag>}
+                  <Popover
+                    title='得分'
+                    disabled={!res?.eventscore}
+                    content={res?.eventscore}
+                  >
+                    <span
+                      className={cx('link')}
+                      dangerouslySetInnerHTML={{ __html: res?.title }}
+                    ></span>
+                  </Popover>
                 </div>
                 <div className={cx('detail')}>
                   <span
